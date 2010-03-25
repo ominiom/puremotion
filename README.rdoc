@@ -1,7 +1,21 @@
-= puremotion
+= PureMotion
 
-A Ruby wrapper for FFmpeg
+A Ruby wrapper for transcoding and reading media formats supported by FFmpeg
 
-== Copyright
+== Usage
 
-Copyright (c) 2010 Ominiom. See LICENSE for details.
+To load and read information from streams in a media file you can call Media
+with a block
+
+    Media 'test.mpg' do
+
+        if video? then
+
+            puts "Resolution : #{video.resolution.join('x')}"
+
+        end
+
+    end
+
+Check the documentation on the *PureMotion::Media* class for methods that can be
+called within the block
