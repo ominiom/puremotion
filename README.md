@@ -12,9 +12,10 @@ PureMotion is a Ruby gem for handling media files through ffmpeg
 FEATURES
 --------
 
-**1. Media Information**: PureMotion uses the libav* libraries from the FFmpeg
+**1. Media Information**:
 
-project to read information from all FFmpeg supported media files.
+PureMotion uses the libav* libraries from the FFmpeg project to read information 
+from all FFmpeg supported media files.
 
 
 **2. Transcoding**:
