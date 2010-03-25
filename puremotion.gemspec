@@ -56,6 +56,7 @@ Gem::Specification.new do |s|
     "spec/units/media_spec.rb",
      "spec/units/preset_spec.rb",
      "spec/spec_helper.rb",
+     "examples/progress_reporting.rb",
      "examples/simple.rb"
   ]
 
