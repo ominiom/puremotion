@@ -1,3 +1,19 @@
+def Media(*args, &block)
+
+  raise ArgumentError, "No arguments given" unless args.length > 0
+  raise ArgumentError, "Invalid file parameter" unless args[0].is_a?(String)
+
+  path = args[0]
+
+  # PureMotion::Media will handle testing if the file exists
+  media = PureMotion::Media.new(path)
+
+  media.instance_eval(&block) if block_given?
+
+  media
+
+end
+
 module PureMotion
 
   class Media
