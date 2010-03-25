@@ -14,20 +14,22 @@ VALUE build_stream_collection(VALUE media) {
 
     AVFormatContext *format_context = get_format_context(media);
 
-    VALUE rb_streams = rb_ary_new2(format_context->nb_streams);
+    VALUE rb_streams = rb_ary_new();
 
-    int i;
+    int i, stream_idx = 0;
 
     for( i = 0; i < format_context->nb_streams; i++ ) {
         AVStream *stream = format_context->streams[i];
 
-        VALUE rb_stream;
+        VALUE rb_stream = Qnil;
 
         if( stream->codec->codec_type == CODEC_TYPE_VIDEO ) rb_stream = build_video_stream( stream, media );
         if( stream->codec->codec_type == CODEC_TYPE_AUDIO ) rb_stream = build_audio_stream( stream, media );
-        else rb_stream = build_stream( stream, media );
 
-        rb_ary_store(rb_streams, i, rb_stream);
+        if( rb_stream != Qnil ) {
+            rb_ary_store(rb_streams, stream_idx, rb_stream);
+            stream_idx++;
+        }
 
     }
 

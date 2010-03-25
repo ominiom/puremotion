@@ -98,6 +98,20 @@ static VALUE stream_grab(VALUE self) {
     return self;
 }
 
+static VALUE stream_resolution(VALUE self, VALUE media) {
+    AVFormatContext * format_context = get_format_context(rb_iv_get(self, "@media"));
+    AVStream * stream = get_stream(self);
+
+    VALUE width = INT2NUM(stream->codec->width);
+    VALUE height = INT2NUM(stream->codec->height);
+
+    VALUE res = rb_ary_new2(2);
+    rb_ary_store(res, 0, width);
+    rb_ary_store(res, 1, height);
+
+    return res;
+}
+
 static VALUE video_stream_init(VALUE self, VALUE media) {
     //printf("Stream initialized\n");
     rb_iv_set(self, "@media", media);
@@ -108,7 +122,7 @@ static VALUE alloc_video_stream(VALUE self) {
     //printf("Stream allocating...\n");
     AVStream * stream = av_new_stream(NULL, 0);
     //printf("Stream wrapping...\n");
-    return Data_Wrap_Struct(rb_cStream, 0, 0, stream);
+    return Data_Wrap_Struct(rb_cVideoStream, 0, 0, stream);
 }
 
 VALUE build_video_stream(AVStream *stream, VALUE rb_media) {
@@ -121,6 +135,7 @@ VALUE build_video_stream(AVStream *stream, VALUE rb_media) {
 void Init_video_stream() {
     rb_cVideoStream = rb_define_class_under(rb_mStreams, "Video", rb_cStream);
 
-    rb_define_method(rb_cVideoStream, "frame_rate",  stream_frame_rate, 0);
+    rb_define_method(rb_cVideoStream, "resolution", stream_resolution, 0);
+    rb_define_method(rb_cVideoStream, "frame_rate", stream_frame_rate, 0);
     rb_define_method(rb_cVideoStream, "grab", stream_grab, 0);
 }

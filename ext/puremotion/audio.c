@@ -21,7 +21,7 @@ static VALUE alloc_audio_stream(VALUE self) {
     //printf("Stream allocating...\n");
     AVStream * stream = av_new_stream(NULL, 0);
     //printf("Stream wrapping...\n");
-    return Data_Wrap_Struct(rb_cStream, 0, 0, stream);
+    return Data_Wrap_Struct(rb_cAudioStream, 0, 0, stream);
 }
 
 VALUE build_audio_stream(AVStream *stream, VALUE rb_media) {
