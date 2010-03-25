@@ -7,7 +7,7 @@ begin
     gem.name = "puremotion"
     gem.summary = %Q{PureMotion}
     gem.description = %Q{A Ruby wrapper for FFmpeg}
-    gem.email = "iain.iw.wilson@googlemail.com"
+    gem.email = "iain@ominiom.com"
     gem.homepage = "http://github.com/ominiom/puremotion"
     gem.authors = ["Ominiom"]
     gem.extensions = ["ext/puremotion/extconf.rb"]
@@ -17,7 +17,8 @@ begin
       "ext/puremotion/*.rb",
       "lib/*",
       "lib/*",
-      "lib/*/*"
+      "lib/*/*",
+      "lib/*/*/*",
     ]
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

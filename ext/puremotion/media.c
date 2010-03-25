@@ -15,7 +15,7 @@ VALUE rb_eUnsupportedFormat;
 static VALUE media_filename(VALUE self) {
     AVFormatContext * format_context = get_format_context(self);
     if( format_context->filename == NULL ) return Qnil;
-    return rb_str_new2(format_context->filename);
+    return rb_funcall(rb_cFile, rb_intern("expand_path"), 1, rb_str_new2(format_context->filename));
 }
 
 /* call-seq: streams => Array<PureMotion::Streams::Stream>
@@ -81,10 +81,10 @@ static VALUE media_duration_human(VALUE self) {
     return rb_str_new2(cstr);
 }
 
-static VALUE media_frame_rate(VALUE self) {
-
-    return Qnil;
-
+// Determines if the file can be read and processed
+// @return [Boolean]
+static VALUE media_valid(VALUE self) {
+    return rb_iv_get(self, "@valid");
 }
 
 /* call-seq: initialize(String) => Media
@@ -114,12 +114,18 @@ static VALUE media_init(VALUE self, VALUE file) {
 
     if( error < 0 ) {
         rb_raise(rb_eUnsupportedFormat, "File '%s' unable to be opened. Unsupported format.", StringValuePtr(file));
+        rb_iv_set(self, "@valid", Qfalse);
         return Qnil;
     }
 
     error = av_find_stream_info(fmt_ctx);
 
-    if( error < 0 ) rb_raise(rb_eUnsupportedFormat, "File '%s': Streams are unreadable.", StringValuePtr(file));
+    if( error < 0 ) {
+        rb_raise(rb_eUnsupportedFormat, "File '%s': Streams are unreadable.", StringValuePtr(file));
+        rb_iv_set(self, "@valid", Qfalse);
+    }
+
+    rb_iv_set(self, "@valid", Qtrue);
 
     return self;
     
@@ -127,14 +133,15 @@ static VALUE media_init(VALUE self, VALUE file) {
 
 static void free_media(AVFormatContext *fmt_ctx) {
     if ( fmt_ctx == NULL) return;
-
     int i;
+    
+    rb_funcall(rb_mKernel, "puts", 1, INT2NUM(fmt_ctx->nb_streams));
 
     for(i = 0; i < fmt_ctx->nb_streams; i++) {
         if( fmt_ctx->streams[i]->codec->codec != NULL )
             avcodec_close(fmt_ctx->streams[i]->codec);
     }
-
+    
     if( fmt_ctx->iformat ) av_close_input_file(fmt_ctx);
     else av_free(fmt_ctx);
 }
@@ -159,9 +166,9 @@ void Init_media() {
     rb_define_method(rb_cMedia, "duration", media_duration, 0);
     rb_define_method(rb_cMedia, "duration_human", media_duration_human, 0);
     rb_define_method(rb_cMedia, "bitrate", media_bitrate, 0);
-    rb_define_method(rb_cMedia, "frame_rate", media_frame_rate, 0);
     rb_define_method(rb_cMedia, "filename", media_filename, 0);
     rb_define_method(rb_cMedia, "streams", media_streams, 0);
+    rb_define_method(rb_cMedia, "valid?", media_valid, 0);
 
     rb_eUnsupportedFormat = rb_define_class_under(rb_mPureMotion, "UnsupportedFormat", rb_eStandardError);
 

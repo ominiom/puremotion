@@ -23,7 +23,7 @@ module PureMotion
       end
 
       def codec(codec)
-        add :ac => codec
+        add :acodec => codec
       end
 
       def language(code)
@@ -31,7 +31,7 @@ module PureMotion
       end
 
       def bitrate(rate)
-        fail ArgumentError, "Invalid bitrate" unless rate =~ @@regexp[:bitrate]
+        fail ArgumentError, "Invalid bitrate" unless rate =~ regexp[:bitrate]
         add :ab => rate
       end
 

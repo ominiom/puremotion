@@ -5,13 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{puremotion}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ominiom"]
-  s.date = %q{2010-03-24}
+  s.date = %q{2010-03-25}
   s.description = %q{A Ruby wrapper for FFmpeg}
-  s.email = %q{iain.iw.wilson@googlemail.com}
+  s.email = %q{iain@ominiom.com}
   s.extensions = ["ext/puremotion/extconf.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
@@ -26,7 +26,6 @@ Gem::Specification.new do |s|
      "ext/puremotion/puremotion.h",
      "ext/puremotion/stream.c",
      "ext/puremotion/stream_collection.c",
-     "ext/puremotion/test.rb",
      "ext/puremotion/utils.c",
      "ext/puremotion/utils.h",
      "ext/puremotion/video.c",
@@ -34,18 +33,31 @@ Gem::Specification.new do |s|
      "lib/events/event.rb",
      "lib/events/generator.rb",
      "lib/media.rb",
+     "lib/preset/audio/audio.rb",
+     "lib/preset/file.rb",
+     "lib/preset/general.rb",
+     "lib/preset/metadata.rb",
+     "lib/preset/preset.rb",
+     "lib/preset/video/crop.rb",
+     "lib/preset/video/pad.rb",
+     "lib/preset/video/video.rb",
      "lib/puremotion.rb",
-     "lib/recipes/ipod.yml",
+     "lib/puremotion_native.so",
      "lib/threading.rb",
      "lib/tools/ffmpeg.rb",
-     "lib/transcode/recipe.rb",
      "lib/transcode/transcode.rb"
   ]
   s.homepage = %q{http://github.com/ominiom/puremotion}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.5}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{PureMotion}
+  s.test_files = [
+    "spec/units/media_spec.rb",
+     "spec/units/preset_spec.rb",
+     "spec/spec_helper.rb",
+     "examples/simple.rb"
+  ]
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION

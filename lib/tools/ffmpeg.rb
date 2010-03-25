@@ -23,11 +23,6 @@ module PureMotion::Tools
     event :status_change
 
     @pid = nil
-    @status = Status::NOT_STARTED
-    
-    def self.run(args = {})
-      FFmpeg.new( args )
-    end
     
     def initialize(params = {})
       if params.class != Hash then raise ArgumentError, "Invalid parameters" end
@@ -46,13 +41,9 @@ module PureMotion::Tools
       end
       
       @output = []
-      
-      go
     end
     
-    def go
-
-      puts "FFmpeg started"
+    def run
 
       temp = ''
       
@@ -73,7 +64,6 @@ module PureMotion::Tools
         end
         if @pio.eof? then
           @done = true
-          puts "FFmpeg exited"
           complete(true)
           @pid = nil
           @pio.close
@@ -86,7 +76,6 @@ module PureMotion::Tools
     def ran?
       @pio.eof? unless @pio.nil?
       false
-      #!find(/^FFmpeg/).nil?
     end
     
     def ended?
@@ -107,41 +96,6 @@ module PureMotion::Tools
     
     def status
       @status
-    end
-    
-    private
-    
-    def prepare_args
-      @args = []
-      @args << ['i', @input]
-      
-      args = []
-    
-      strings = []
-    
-      @args.each do |arg, value|
-        if value.nil? then value = '' end
-        value = '"' + value.to_s + '"' unless value.index(' ').nil?
-        
-        args << [ arg, value]
-        
-        if value.empty? or value =~ /^\s*$/ then
-          value = ''
-        else
-          value = ' ' << value
-        end
-        
-        strings << ( '-' << arg << value )
-      end
-      
-      if !@output.nil? then strings << '"' + @output + '"' end
-      
-      @args = strings.join(' ')
-    end
-    
-    def status=(status_const)
-      @status = status_const
-      status_change(status_const)
     end
     
   end

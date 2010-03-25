@@ -30,12 +30,6 @@ module PureMotion
       first_stream_of :audio
     end
 
-    # Determines if the file can be read by FFmpeg
-    # @return [Boolean]
-    def valid?
-      true
-    end
-
     # Determines if the file cannot be read by FFmpeg
     # @return [Boolean]
     def invalid?

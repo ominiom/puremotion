@@ -3,7 +3,10 @@ require File.dirname(__FILE__) + '/../spec_helper.rb'
 describe PureMotion::Preset do
 
   it "should support all possible inputs" do
+    begin
     PureMotion::Preset.build do
+
+      input sample_path
 
       overwrite!
 
@@ -79,6 +82,9 @@ describe PureMotion::Preset do
 
       end
 
+      output "output.mp4"
+
+    end
     end.should_not raise_error
   end
 

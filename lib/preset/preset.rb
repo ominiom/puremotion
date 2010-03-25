@@ -6,16 +6,21 @@ module PureMotion
 
       preset = self.new(:dsl)
       preset.instance_eval(&block) if block_given?
-      puts preset.arguments
 
       preset
 
     end
 
+    attr_accessor :event_handlers
+
     def initialize(form=nil)
+      @input = nil
+      @output = nil
+      @log = nil
       @previous = :general
       @current = :general
       @commands = []
+      @event_handlers = {}
       @dsls = [:general, :file, :video, :audio, :metadata ,:crop, :pad]
       extend_for(:general) if form == :dsl
     end
@@ -29,8 +34,52 @@ module PureMotion
     end
 
     def arguments
-        @commands.join(" ")
+      @commands.join(" ")
+    end
+
+    def event(name, &block)
+      @event_handlers[name] = block
+    end
+
+    def event_handler(name)
+      @event_handlers[name]
+    end
+
+    def log(log=nil)
+      return @log if log.nil?
+      @log = log
+      true
+    end
+
+    def output(output=nil)
+      return @output if output.nil?
+      return false unless @output.nil?
+      output = "\"#{output}\"" if output =~ /\s/ and !(output =~ /^".*"$/)
+      @output = output
+      add @output
+      true
+    end
+
+    def input(input=nil)
+      return @input if input.nil?
+      return false unless @input.nil?
+      if input.is_a?(String) then
+        if ::File.exists?(input) then # Ruby's File class is hidden by Preset::File
+          @input = PureMotion::Media.new(input)
+        else
+          raise ArgumentError, "Input file '#{input}' not found"
+        end
+      else
+        if input.is_a?(PureMotion::Media)
+          @input = input
+        else
+          raise ArgumentError, "Invalid input"
+        end
       end
+      raise ArgumentError, "Invalid media input '#{@input.filename}'" unless @input.valid?
+      add :i => @input.filename
+      true
+    end
 
     private
 
