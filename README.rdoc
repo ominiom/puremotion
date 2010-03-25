@@ -1,0 +1,7 @@
+= puremotion
+
+A Ruby wrapper for FFmpeg
+
+== Copyright
+
+Copyright (c) 2010 Ominiom. See LICENSE for details.
