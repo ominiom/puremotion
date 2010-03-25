@@ -15,12 +15,12 @@ Gem::Specification.new do |s|
   s.extensions = ["ext/puremotion/extconf.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.md"
+     "README.markdown"
   ]
   s.files = [
     ".yardopts",
      "LICENSE",
-     "README.md",
+     "README.markdown",
      "Rakefile",
      "ext/puremotion/audio.c",
      "ext/puremotion/extconf.rb",

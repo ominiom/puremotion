@@ -12,7 +12,7 @@ begin
     gem.authors = ["Ominiom"]
     gem.extensions = ["ext/puremotion/extconf.rb"]
     gem.files = [
-      "README.md",
+      "README.markdown",
       "LICENSE",
       "Rakefile",
       ".yardopts",
