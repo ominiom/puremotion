@@ -15,10 +15,13 @@ Gem::Specification.new do |s|
   s.extensions = ["ext/puremotion/extconf.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.rdoc"
+     "README.md"
   ]
   s.files = [
-    "ext/puremotion/audio.c",
+    "LICENSE",
+     "README.md",
+     "Rakefile",
+     "ext/puremotion/audio.c",
      "ext/puremotion/extconf.rb",
      "ext/puremotion/frame.c",
      "ext/puremotion/media.c",
@@ -29,7 +32,6 @@ Gem::Specification.new do |s|
      "ext/puremotion/utils.c",
      "ext/puremotion/utils.h",
      "ext/puremotion/video.c",
-     "lib/codecs.rb",
      "lib/events/event.rb",
      "lib/events/generator.rb",
      "lib/media.rb",
