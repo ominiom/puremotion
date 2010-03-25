@@ -2,6 +2,7 @@ PureMotion (0.1.0)
 ==================
 
 **Homepage**:  [http://github.com/ominiom/puremotion](http://github.com/ominiom/puremotion)
+**Docs (Incomplete)**: [http://ominiom.net/projects/puremotion/doc/](http://ominiom.net/projects/puremotion/doc/)
 
 OVERVIEW
 --------

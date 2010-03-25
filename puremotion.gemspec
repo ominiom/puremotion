@@ -18,7 +18,8 @@ Gem::Specification.new do |s|
      "README.md"
   ]
   s.files = [
-    "LICENSE",
+    ".yardopts",
+     "LICENSE",
      "README.md",
      "Rakefile",
      "ext/puremotion/audio.c",
