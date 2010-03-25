@@ -69,6 +69,21 @@ module PureMotion
       return has
     end
 
+    def transcode(&block)
+      raise ArgumentError, "No block given for transcode parameters" unless block_given?
+
+      media = self
+      setup = lambda { input media }
+
+      t = Transcode do
+        instance_eval(&setup)
+        instance_eval(&block)
+      end
+
+      t
+
+    end
+
   end
 
 end
