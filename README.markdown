@@ -58,7 +58,7 @@ a video stream.
     Media 'sample.mp4' do
 
         if video? then
-            seek(5).grab.resize(320, 240).save('thumb.png')
+            video.seek(5).grab.resize(320, 240).save('thumb.png')
         end
 
     end
