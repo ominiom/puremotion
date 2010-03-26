@@ -22,6 +22,13 @@ static AVFrame * alloc_picture(int pix_fmt, int width, int height) {
     return picture;
 }
 
+/* Convert frame to RGB24
+ *
+ * Used internally to convert the pixel format when resizing and saving to PNG
+ *
+ * @return [PureMotion::Frame] Frame in RGB24 format
+ *
+ */
 static VALUE frame_to_rgb24(VALUE self) {
     int width = NUM2INT(rb_iv_get(self, "@width"));
     int height = NUM2INT(rb_iv_get(self, "@height"));
@@ -42,8 +49,10 @@ static VALUE frame_to_rgb24(VALUE self) {
     return build_frame_object(to, width, height, PIX_FMT_RGB24);
 }
 
-
-
+/* Encodes the frame in PPM format
+ *
+ * @return [String] PPM encoded representation of the frame
+ */
 static VALUE frame_to_ppm(VALUE self) {
     VALUE rb_frame = frame_to_rgb24(self);
     AVFrame * frame = get_frame(rb_frame);
@@ -63,6 +72,13 @@ static VALUE frame_to_ppm(VALUE self) {
     return rb_str_new(data_string, size);
 }
 
+/* Resizes the frame using libgd
+ *
+ * @param [Integer] width Target width
+ * @param [Integer] height Target height
+ *
+ * @return [PureMotion::Frame] New frame that's been resized
+ */
 static VALUE frame_resize(VALUE self, VALUE w, VALUE h) {
 
     int orig_width = NUM2INT(rb_iv_get(self, "@width"));
@@ -89,6 +105,12 @@ static VALUE frame_resize(VALUE self, VALUE w, VALUE h) {
     
 }
 
+/* Saves the frame to PNG
+ *
+ * @param [String] path A writable path to save the frame to
+ *
+ * @return [PureMotion::Frame] self
+ */
 static VALUE frame_save(VALUE self, VALUE filename) {
 
     int w = NUM2INT(rb_iv_get(self, "@width"));
