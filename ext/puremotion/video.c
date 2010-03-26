@@ -27,6 +27,13 @@ static int next_packet_for_stream(AVFormatContext * format_context, int stream_i
     return ret;
 }
 
+/*
+ * call-seq: frame_rate => Float
+ *
+ * Returns the video frame rate as a Float
+ *
+ * @return [Float] Framerate
+ */
 static VALUE stream_frame_rate(VALUE self) {
     AVStream * stream = get_stream(self);
     return(rb_float_new(av_q2d(stream->r_frame_rate)));
@@ -66,8 +73,23 @@ static int extract_next_frame(AVFormatContext * format_context, AVCodecContext *
 /*
  * call-seq: grab => PureMotion::Frame
  *
+ * Grabs a single frame from the current position in the stream.
  *
+ * Example Usage:
  *
+ *      Media 'sample.wmv' do
+ *
+ *          if video? then
+ *
+ *              frame = video.seek(5).grab
+ *
+ *              # Resize, save
+ *
+ *          end
+ *
+ *      end
+ *
+ * @return [PureMotion::Frame]
  */
 
 static VALUE stream_grab(VALUE self) {
@@ -120,6 +142,12 @@ static VALUE stream_grab(VALUE self) {
     return self;
 }
 
+/* call-seq: resolution => Array<Integer width, Integer height>
+ *
+ * Returns video frame resolution as [width, height] array
+ *
+ * @return [Array<Integer width, Integer height>]
+ */
 static VALUE stream_resolution(VALUE self, VALUE media) {
     AVFormatContext * format_context = get_format_context(rb_iv_get(self, "@media"));
     AVStream * stream = get_stream(self);
