@@ -25,6 +25,5 @@ require req + 'preset/audio/audio'
 
 require req + 'threading'
 require req + 'media'
-require req + 'codecs'
 require req + 'transcode/transcode'
 require req + 'tools/ffmpeg'
