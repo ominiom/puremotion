@@ -113,6 +113,20 @@ static VALUE frame_resize(VALUE self, VALUE w, VALUE h) {
  */
 static VALUE frame_save(VALUE self, VALUE filename) {
 
+    VALUE directory = rb_funcall(rb_cFile, rb_intern("dirname"), 1, filename);
+    VALUE writable = rb_funcall(rb_cFile, rb_intern("writable?"), 1, directory);
+    VALUE exists = rb_funcall(rb_cFile, rb_intern("exists?"), 1, filename);
+
+    if( exists == Qtrue ) {
+        rb_raise(rb_eArgError, "File '%s' already exists.", STR2CSTR(filename));
+        return self;
+    }
+
+    if( writable == Qfalse ) {
+        rb_raise(rb_eArgError, "File '%s' is not writable.", STR2CSTR(filename));
+        return self;
+    }
+
     int w = NUM2INT(rb_iv_get(self, "@width"));
     int h = NUM2INT(rb_iv_get(self, "@height"));
 
