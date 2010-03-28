@@ -62,7 +62,7 @@ module PureMotion::Transcode
       @output = File.expand_path(@preset.output || options[:output])
       validate_output
 
-      @ffmpeg = PureMotion::Tools::FFmpeg.new(:options => @preset.arguments)
+      @ffmpeg = PureMotion::Tools::FFmpeg.new(@preset.arguments)
 
       if options[:log] then
         @log = File.new(options[:log], 'w')
@@ -74,7 +74,7 @@ module PureMotion::Transcode
         end
       end
 
-      @ffmpeg.on(:line) do |line|
+      @ffmpeg.on(:output) do |line|
         handle_output line
       end
 
@@ -148,7 +148,7 @@ module PureMotion::Transcode
         :percent  => ((100.00 / @input.duration) * line[6].to_f).to_i
       }
       progress[:percent] = 100 if progress[:percent] > 100 unless progress[:percent].nil?
-      fire(:progress, self, p)
+      fire(:progress, self, progress)
     end
     
     def validate_input

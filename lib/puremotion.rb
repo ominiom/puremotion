@@ -22,7 +22,7 @@ require req + 'preset/video/crop'
 require req + 'preset/video/pad'
 require req + 'preset/audio/audio'
 
-
+require req + 'process'
 require req + 'threading'
 require req + 'media'
 require req + 'transcode/transcode'
