@@ -32,9 +32,17 @@ module PureMotion
       @process = IO.popen("#{@command} 2>&1")
       @id = @process.pid
 
-      @process.each_byte { |byte|
-        @process.closed? ? handle_exit : handle_output(byte)
-    }
+      runner = lambda {
+        @process.each_byte { |byte|
+          @process.closed? ? handle_exit : handle_output(byte)
+        }
+      }
+
+      if PureMotion::Settings[:threaded] then
+        PureMotion::Thread.new { runner.call }
+      else
+        runner.call
+      end
 
     end
 
