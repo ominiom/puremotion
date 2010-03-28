@@ -2,38 +2,46 @@ def Transcode(*args, &block)
 
   raise ArgumentError, "No block given for transcode preset" unless block_given?
 
-  preset = PureMotion::Preset.new(:dsl)
+  preset_options = {
+    :from => :dsl
+  }
+
+  preset_options[:input] = args[0] || nil
+
+  preset = PureMotion::Preset.new(preset_options)
   preset.instance_eval(&block)
 
-  options = {
-    :input => preset.input,
-    :output => preset.output,
+  transcode_options = {
     :preset => preset
   }
 
-  options[:log] = preset.log unless preset.log.nil?
+  transcode_options[:log] = preset.log unless preset.log.nil?
 
-  transcode = PureMotion::Transcode::Transcode.new(options)
+  transcode = PureMotion::Transcode::Transcode.new(transcode_options)
 
-  transcode.run
-
-  return transcode
+  if transcode.valid? then
+    transcode.run
+    return transcode
+  else
+    return false
+  end
 
 end
 
 module PureMotion::Transcode
   
-  class Transcode < Object
+  class Transcode
 
     event :progress
     event :complete
     event :output
-    
-    @ffmpeg = nil
-    @input = nil
-    
+    event :failure
+
     def initialize(options)
-      
+
+      @valid = true # Until it all goes wrong
+
+      # Default everything to nil
       default_options = {
         :output => nil,
         :preset => nil,
@@ -43,46 +51,45 @@ module PureMotion::Transcode
       raise ArgumentError, "Invalid transcode parameters given" unless options.is_a?(Hash)
       
       options = default_options.merge(options)
-      
-      raise ArgumentError, "No output file given" if options[:output].nil?
 
-      if options[:input].is_a?(String) then
-        @input = PureMotion::Media.new(options[:input])
-      else
-        @input = options[:input]
-      end
       @preset = options[:preset]
-      @output = options[:output]
-
-      validate
 
       wire_events
 
+      @input = (@preset.input || options[:input])
+      validate_input
+      
+      @output = File.expand_path(@preset.output || options[:output])
+      validate_output
+
+      @ffmpeg = PureMotion::Tools::FFmpeg.new(:options => @preset.arguments)
+
       if options[:log] then
         @log = File.new(options[:log], 'w')
-        self.output + lambda do |t, line|
+        on(:output) do |line|
           @log.puts line
         end
-        self.complete + lambda do |t, complete|
+        @ffmpeg.on(:exit) do
           @log.close
         end
       end
-      
-      # Raise error if output file exists and overwrite not set
-      
-      @ffmpeg = PureMotion::Tools::FFmpeg.new(:options => @preset.arguments)
-	
-      @ffmpeg.line + lambda do |ffmpeg, line|
+
+      @ffmpeg.on(:line) do |line|
         handle_output line
       end
 
-      @ffmpeg.exited + lambda do |ffmpeg, exited|
-        complete(true)
+      @ffmpeg.on(:exit) do
+        handle_exit
       end
-      
+
+    end
+
+    def valid?
+      return @valid
     end
     
     def run
+      raise ArgumentError, "Transcode is invalid" unless valid?
       @ffmpeg.run
     end
     
@@ -95,9 +102,27 @@ module PureMotion::Transcode
     end
     
     private
-    
+
+    def invalidate!
+      @valid = false
+    end
+
+    def handle_exit
+      if !File.exists?(@output) then
+        fire(:failure, :output_missing)
+        return
+      end
+      begin
+        output_media = Media(@output)
+        fire(:complete, output_media) if output_media.valid?
+      rescue PureMotion::UnsupportedFormat
+        fire(:failure, :transcode_unreadable)
+        return
+      end
+    end
+
     def handle_output line
-      output line
+      fire(:output, line)
       # /^frame=\s*(?<frame>\d*)\s*fps=\s*(?<fps>\d*)\s*q=(?<q>\S*)\s*size=\s*(?<size>[\d]*)(?<size_unit>[kmg]B)\s*time=\s*(?<time>[\d.]*)\s*bitrate=\s*(?<bitrate>[\d.]*)(?<bitrate_unit>[km]b).*$/
       progress_line = /frame=\s*(\d*)\s*fps=\s*(\d*)\s*q=(\S*)\s*[L]?size=\s*([\d]*)([kmg]B)\s*time=\s*([\d.]*)\s*bitrate=\s*([\d.]*)([km]b)/
       # The regex is documentated above and the matches it should give below
@@ -113,8 +138,7 @@ module PureMotion::Transcode
     end
     
     def handle_progress line
-      if line[4].to_i == 0 then return false end
-      p = {
+      progress = {
         :frame    => line[1].to_i,
         :fps      => line[2].to_i,
         :q        => line[3].to_f,
@@ -123,17 +147,42 @@ module PureMotion::Transcode
         :bitrate  => line[7].to_f,
         :percent  => ((100.00 / @input.duration) * line[6].to_f).to_i
       }
-      p[:percent] = 100 if p[:percent] > 100 unless p[:percent].nil?
-      progress(p)
+      progress[:percent] = 100 if progress[:percent] > 100 unless progress[:percent].nil?
+      fire(:progress, self, p)
     end
     
-    def validate
-      
+    def validate_input
+      if @input.is_a?(String) then
+        begin
+          @input = Media @input
+        rescue PureMotion::UnsupportedFormat
+          make_fail(:invalid_input, "Invalid input '#{@input}'")
+        end
+      end
+      if @input.is_a?(PureMotion::Media) then
+        make_fail(:invalid_input, "Invalid input '#{@input}'") unless @input.valid?
+      end
+    end
+
+    def validate_output
+      make_fail(:invalid_output, "No output file given") if @output.nil?
+      # TODO : Check if output file exists and overwite not set
+      make_fail(:invalid_output, "Output file '#{@output}' not writable") unless File.writable?(File.dirname(@output))
+    end
+
+    def make_fail(reason=:unknown,message="Unknown reason")
+      #invalidate!
+      if @preset.event_handler(:failure).nil? then
+        raise ArgumentError, message
+      else
+        fire(:failure, reason, message)
+      end
     end
 
     def wire_events
-      self.complete += @preset.event_handlers[:complete] unless @preset.event_handlers[:complete].nil?
-      self.progress += @preset.event_handlers[:progress] unless @preset.event_handlers[:progress].nil?
+      @preset.event_handlers.each_pair do |event, handler|
+        on(event) + handler
+      end
     end
 
   end

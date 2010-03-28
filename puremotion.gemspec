@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ominiom"]
-  s.date = %q{2010-03-26}
+  s.date = %q{2010-03-27}
   s.description = %q{A Ruby wrapper for FFmpeg}
   s.email = %q{iain@ominiom.com}
   s.extensions = ["ext/puremotion/extconf.rb"]
@@ -60,6 +60,7 @@ Gem::Specification.new do |s|
      "spec/units/preset_spec.rb",
      "spec/spec_helper.rb",
      "examples/progress_reporting.rb",
+     "examples/test.rb",
      "examples/simple.rb"
   ]
 

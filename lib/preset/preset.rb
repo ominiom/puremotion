@@ -4,7 +4,7 @@ module PureMotion
 
     def self.build(&block)
 
-      preset = self.new(:dsl)
+      preset = self.new({ :from => :dsl })
       preset.instance_eval(&block) if block_given?
 
       preset
@@ -13,7 +13,16 @@ module PureMotion
 
     attr_accessor :event_handlers
 
-    def initialize(form=nil)
+    def initialize(options = {})
+
+      defaults = {
+        :from => :dsl,
+        :input => nil,
+        :output => nil
+      }
+
+      options = defaults.merge(options)
+
       @input = nil
       @output = nil
       @log = nil
@@ -22,7 +31,11 @@ module PureMotion
       @commands = []
       @event_handlers = {}
       @dsls = [:general, :file, :video, :audio, :metadata ,:crop, :pad]
-      extend_for(:general) if form == :dsl
+
+      input(options[:input]) unless options[:input].nil?
+      output(options[:output]) unless options[:output].nil?
+
+      extend_for(:general) if options[:from] == :dsl
     end
 
     def method_missing(name, *args, &block)
@@ -42,7 +55,7 @@ module PureMotion
     end
 
     def event_handler(name)
-      @event_handlers[name]
+      @event_handlers[name] or nil
     end
 
     def log(log=nil)
@@ -65,15 +78,28 @@ module PureMotion
       return false unless @input.nil?
       if input.is_a?(String) then
         if ::File.exists?(input) then # Ruby's File class is hidden by Preset::File
-          @input = PureMotion::Media.new(input)
+          begin
+            @input = PureMotion::Media.new(input)
+          rescue PureMotion::UnsupportedFormat
+            if event_handler(:failure).nil? then
+              raise ArgumentError, "Invalid input file '#{input}'" if event_handler(:failure).nil?
+              return false
+            else
+              event_handler(:failure).call(:invalid_input, "Invalid input file '#{input}'")
+              return false
+            end
+          end
         else
           raise ArgumentError, "Input file '#{input}' not found"
+          return false
         end
       else
         if input.is_a?(PureMotion::Media)
           @input = input
+          return true
         else
           raise ArgumentError, "Invalid input"
+          return false
         end
       end
       raise ArgumentError, "Invalid media input '#{@input.filename}'" unless @input.valid?

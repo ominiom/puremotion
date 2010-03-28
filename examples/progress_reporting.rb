@@ -17,7 +17,7 @@ Transcode do
 
   output 'test.flv'
 
-  log 'simple.log'
+  log 'progress_reporting.log'
 
   event :progress do |transcode, progress|
     puts "#{progress[:percent]}%"

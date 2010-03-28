@@ -1,50 +1,31 @@
-# ruby-event - generator.rb
-# Author    :: Stefan Nuxoll
-# License   :: BSD License
-# Copyright :: Copyright (C) 2009 Stefan Nuxoll
+module PureMotion
+  module Events
+    module Generator
 
-module PureMotion::Events
-  module Generator
-  
-    # Constructs the methods and objects for an event automatically
-    #
-    # Example:
-    #   event :data_received
-    def event(event_name)
-      self.class_eval <<-EOT
-      
-        def #{event_name}(*args, &block)
-          _ensure_events
-          if not @_events["#{event_name}"]
-            @_events["#{event_name}"] = PureMotion::Events::Event.new
+      def event(event_name)
+        @@_events_built = false unless class_variable_defined?(:@@_events_built)
+        self._build_events unless @@_events_built
+      end
+
+      def _build_events
+        self.class_eval do
+
+          def on(event_name, &block)
+            @_events = {} unless instance_variable_defined?(:@_events)
+            @_events[event_name] = PureMotion::Events::Event.new unless @_events[event_name]
+            return @_events[event_name] unless block_given?
+            @_events[event_name] + block
           end
-          if args != []
-            @_events["#{event_name}"].call(self, args)
-          else
-            if block
-              #{event_name} + block
-            else
-              @_events["#{event_name}"]
-            end
+
+          def fire(event_name, *args)
+            @_events = {} unless instance_variable_defined?(:@_events)
+            @_events[event_name].call(*args) unless @_events[event_name].nil?
           end
+
         end
-        
-        def #{event_name}=(event)
-          _ensure_events
-          if PureMotion::Events::Event === event
-            @_events["#{event_name}"] = event
-          end
-        end
-        
-        def _ensure_events
-          if not @_events
-            @_events = {}
-          end
-        end
-        
-        private :_ensure_events 
-      EOT
+        @@_events_built = true
+      end
+
     end
-    
   end
 end

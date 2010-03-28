@@ -1,26 +1,13 @@
 module PureMotion::Tools
   
   class FFmpeg
-    
-    class Status
-      
-      NOT_STARTED       = 1
-      INITIALIZING      = 2
-      ANALYZING         = 4
-      PREPARING_OUTPUT  = 8
-      ENCODING          = 16
-      ERROR             = 32
-      
-    end
 
     attr_reader :pid
     attr_reader :args
     attr_accessor :output
     
     event :line
-    event :complete
     event :exited
-    event :status_change
 
     @pid = nil
     
@@ -47,13 +34,12 @@ module PureMotion::Tools
 
       temp = ''
       
-      @thread = PureMotion::Thread.new do
         @pio = IO.popen("ffmpeg #{@options} 2>&1")
         @pid = @pio.pid
         @pio.each_byte do |l|
           if l == 10 or l == 13 then
             @output.push temp
-            line(temp)
+            fire(:line, temp)
             temp = ''
             l = ''
           else
@@ -64,12 +50,10 @@ module PureMotion::Tools
         end
         if @pio.eof? then
           @done = true
-          complete(true)
           @pid = nil
           @pio.close
-          exited(true)
+          fire(:exit)
         end
-      end
     
     end
     
@@ -92,10 +76,6 @@ module PureMotion::Tools
       m = regexp.match(@output)
       return m[1] if m
       nil
-    end
-    
-    def status
-      @status
     end
     
   end

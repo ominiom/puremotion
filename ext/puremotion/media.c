@@ -115,7 +115,7 @@ static VALUE media_init(VALUE self, VALUE file) {
     if( error < 0 ) {
         rb_raise(rb_eUnsupportedFormat, "File '%s' unable to be opened. Unsupported format.", StringValuePtr(file));
         rb_iv_set(self, "@valid", Qfalse);
-        return Qnil;
+        return self;
     }
 
     error = av_find_stream_info(fmt_ctx);
@@ -123,6 +123,7 @@ static VALUE media_init(VALUE self, VALUE file) {
     if( error < 0 ) {
         rb_raise(rb_eUnsupportedFormat, "File '%s': Streams are unreadable.", StringValuePtr(file));
         rb_iv_set(self, "@valid", Qfalse);
+        return self;
     }
 
     rb_iv_set(self, "@valid", Qtrue);

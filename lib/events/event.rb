@@ -43,17 +43,17 @@ module PureMotion::Events
     
     # Calls all of the handlers for the events, with the given sender and set
     # of arguments.
-    def call(sender, args)
+    def call(*args)
       # Make sure we don't get surprised with new friends while we're calling
       # the handlers
       named_handlers = @named_handlers
       handlers       = @handlers
     
       named_handlers.each do |name, handler|
-        handler.call(sender, *args)
+        handler.call(*args)
       end
       handlers.each do |handler|
-        handler.call(sender, *args)
+        handler.call(*args)
       end
     end
     
