@@ -12,6 +12,7 @@ require req + 'events/generator'
 
 Object.extend(PureMotion::Events::Generator)
 
+require req + 'settings'
 require req + 'preset/preset'
 
 require req + 'preset/general'
