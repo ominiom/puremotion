@@ -9,9 +9,10 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Ominiom"]
-  s.date = %q{2010-03-27}
+  s.date = %q{2010-04-03}
   s.description = %q{A Ruby wrapper for FFmpeg}
   s.email = %q{iain@ominiom.com}
+  s.executables = ["default.yaml", "pmts"]
   s.extensions = ["ext/puremotion/extconf.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
@@ -44,8 +45,13 @@ Gem::Specification.new do |s|
      "lib/preset/video/crop.rb",
      "lib/preset/video/pad.rb",
      "lib/preset/video/video.rb",
+     "lib/process.rb",
      "lib/puremotion.rb",
      "lib/puremotion_native.so",
+     "lib/server/app.rb",
+     "lib/server/database.rb",
+     "lib/server/server.rb",
+     "lib/settings.rb",
      "lib/threading.rb",
      "lib/tools/ffmpeg.rb",
      "lib/transcode/transcode.rb"
@@ -57,11 +63,13 @@ Gem::Specification.new do |s|
   s.summary = %q{PureMotion}
   s.test_files = [
     "spec/units/media_spec.rb",
+     "spec/units/transcode_spec.rb",
      "spec/units/preset_spec.rb",
      "spec/spec_helper.rb",
      "examples/progress_reporting.rb",
-     "examples/test.rb",
-     "examples/simple.rb"
+     "examples/failure_handling.rb",
+     "examples/simple.rb",
+     "examples/process.rb"
   ]
 
   if s.respond_to? :specification_version then

@@ -34,7 +34,7 @@ module PureMotion
 
       runner = lambda {
         @process.each_byte { |byte|
-          @process.closed? ? handle_exit : handle_output(byte)
+          @process.eof? ? handle_exit : handle_output(byte)
         }
       }
 
@@ -47,7 +47,13 @@ module PureMotion
     end
 
     def kill!
-      
+      return false unless @status == :running
+      ::Process.kill('TERM', @id)
+    end
+
+    def kill!
+      return false unless @status == :running
+      ::Process.kill('KILL', @id)
     end
 
     private
