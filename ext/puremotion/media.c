@@ -133,10 +133,14 @@ static VALUE media_init(VALUE self, VALUE file) {
 }
 
 static void free_media(AVFormatContext *fmt_ctx) {
-    if ( fmt_ctx == NULL) return;
+
+    printf("Freeing\n");
+
+    if ( fmt_ctx == NULL)  {
+        printf("Was null\n");    
+        return;
+    }
     int i;
-    
-    rb_funcall(rb_mKernel, "puts", 1, INT2NUM(fmt_ctx->nb_streams));
 
     for(i = 0; i < fmt_ctx->nb_streams; i++) {
         if( fmt_ctx->streams[i]->codec->codec != NULL )
@@ -145,9 +149,17 @@ static void free_media(AVFormatContext *fmt_ctx) {
     
     if( fmt_ctx->iformat ) av_close_input_file(fmt_ctx);
     else av_free(fmt_ctx);
+
+    printf("Freed\n");
 }
 
 static VALUE alloc_media(VALUE self) {
+
+    // Fixes the problem where GC only runs on exit,
+    // so in a script that opens a lot of media files
+    // it runs out of memory
+    rb_gc();
+
     AVFormatContext * fmt_ctx = av_alloc_format_context();
     VALUE obj;
     fmt_ctx->oformat = NULL;

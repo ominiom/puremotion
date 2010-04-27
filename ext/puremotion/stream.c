@@ -1,6 +1,28 @@
 #include "puremotion.h"
 #include "utils.h"
 
+int next_packet(AVFormatContext * format_context, AVPacket * packet)
+{
+    if(packet->data != NULL)
+        av_free_packet(packet);
+
+    if(av_read_frame(format_context, packet) < 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int next_packet_for_stream(AVFormatContext * format_context, int stream_index, AVPacket * packet)
+{
+    int ret = 0;
+    do {
+        ret = next_packet(format_context, packet);
+    } while(packet->stream_index != stream_index && ret == 0);
+
+    return ret;
+}
+
 VALUE rb_cStream;
 VALUE rb_mStreams;
 
@@ -54,7 +76,7 @@ static VALUE stream_seek(VALUE self, VALUE position) {
 static VALUE stream_bitrate(VALUE self) {
     AVStream * stream = get_stream(self);
 
-    rb_float_new(stream->codec->bit_rate);
+    return rb_float_new(stream->codec->bit_rate);
 }
 
 

@@ -1,31 +1,11 @@
 #include "puremotion.h"
 #include "utils.h"
 
+#include "stream.h"
+
 VALUE rb_cStream;
 VALUE rb_cVideoStream;
 VALUE rb_mStreams;
-
-static int next_packet(AVFormatContext * format_context, AVPacket * packet)
-{
-    if(packet->data != NULL)
-        av_free_packet(packet);
-
-    if(av_read_frame(format_context, packet) < 0) {
-        return -1;
-    }
-
-    return 0;
-}
-
-static int next_packet_for_stream(AVFormatContext * format_context, int stream_index, AVPacket * packet)
-{
-    int ret = 0;
-    do {
-        ret = next_packet(format_context, packet);
-    } while(packet->stream_index != stream_index && ret == 0);
-
-    return ret;
-}
 
 /*
  * call-seq: frame_rate => Float

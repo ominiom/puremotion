@@ -12,6 +12,9 @@
 
 #include "ruby.h"
 
+#ifndef PM_H
+#define PM_H
+
 RUBY_EXTERN VALUE rb_mPureMotion;
 RUBY_EXTERN VALUE rb_mStreams;
 RUBY_EXTERN VALUE rb_cMedia;
@@ -36,3 +39,5 @@ VALUE build_stream(AVStream *stream, VALUE rb_media);
 VALUE build_video_stream(AVStream *stream, VALUE rb_media);
 VALUE build_audio_stream(AVStream *stream, VALUE rb_media);
 VALUE build_frame_object(AVFrame * frame, int width, int height, int pixel_format);
+
+#endif

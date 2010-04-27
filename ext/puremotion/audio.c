@@ -8,7 +8,7 @@ VALUE rb_mStreams;
 static VALUE stream_sample_rate(VALUE self) {
     AVStream * stream = get_stream(self);
 
-    rb_float_new(stream->codec->sample_rate);
+    return rb_float_new(stream->codec->sample_rate);
 }
 
 static VALUE audio_stream_init(VALUE self, VALUE media) {

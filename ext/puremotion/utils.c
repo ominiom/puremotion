@@ -4,6 +4,7 @@ AVFormatContext * get_format_context(VALUE self)
 {
     AVFormatContext * format_context = NULL;
     Data_Get_Struct(self, AVFormatContext, format_context);
+
     if (NULL == format_context) {
         rb_fatal("FFMPEG internal error\n");
     }
