@@ -44,6 +44,13 @@ static VALUE stream_type( VALUE self ) {
 
 }
 
+static VALUE stream_codec(VALUE self) {
+    AVStream * stream = get_stream(self);
+
+    VALUE name = rb_str_new2(stream->codec->codec_name);
+    return name;
+}
+
 static VALUE stream_duration(VALUE self) {
     AVStream *stream = get_stream(self);
 
@@ -125,4 +132,5 @@ void Init_stream() {
     rb_define_method(rb_cStream, "bitrate",  stream_bitrate, 0);
     rb_define_method(rb_cStream, "seek",  stream_seek, 1);
     rb_define_method(rb_cStream, "position", stream_position, 0);
+    rb_define_method(rb_cStream, "codec", stream_codec, 0);
 }
