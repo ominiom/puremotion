@@ -47,8 +47,10 @@ static VALUE stream_type( VALUE self ) {
 static VALUE stream_codec(VALUE self) {
     AVStream * stream = get_stream(self);
 
-    VALUE name = rb_str_new2(stream->codec->codec_name);
-    return name;
+    AVCodec * codec = avcodec_find_encoder(stream->codec->codec_id);
+
+    if(codec != 0) return rb_str_new2(codec->name);
+    else return rb_str_new2("");
 }
 
 static VALUE stream_duration(VALUE self) {
